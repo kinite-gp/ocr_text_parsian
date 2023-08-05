@@ -153,3 +153,4 @@ cython_debug/
 .ipynb_checkpoints/
 *.png
 env
+my_env/

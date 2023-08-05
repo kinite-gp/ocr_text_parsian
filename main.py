@@ -1,7 +1,6 @@
 import pytesseract
-from PIL import Image, ImageGrab
+from PIL import ImageGrab
 import cv2
-import matplotlib.pyplot as plt
 import pyperclip
 import os
 import win10toast
@@ -46,7 +45,6 @@ else:
 
 if status:
     image = cv2.imread("image.png", 0)
-    plt.imshow(image, cmap='gray')
     pytesseract.get_languages()
     ocr_text = pytesseract.image_to_string(image, lang="fas")
     pyperclip.copy(ocr_text)
