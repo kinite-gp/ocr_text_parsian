@@ -2,52 +2,37 @@ import pytesseract
 from PIL import ImageGrab
 import cv2
 import pyperclip
-import os
-import win10toast
-import winreg
-
-notif = win10toast.ToastNotifier()
-
-
-def add_to_path():
-    cwd = os.getcwd()
-    variable_name = "TESSDATA_PREFIX"
-    variable_value = os.path.join(cwd, "Tesseract-OCR", "tessdata")
-
-    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, 'Environment', 0, winreg.KEY_ALL_ACCESS)
-    winreg.SetValueEx(key, variable_name, 0, winreg.REG_SZ, variable_value)
-    winreg.CloseKey(key)
-
-    notif.show_toast("Parsian OCR", "Successfully added to environment variables!")
-
-    file = open("env", 'w')
-    file.close()
-
-
-file_path = 'env'
-
-if os.path.exists(file_path):
-    pass
-else:
-    add_to_path()
+from win10toast import ToastNotifier
+import keyboard
+from time import sleep
 
 pytesseract.pytesseract.tesseract_cmd = "Tesseract-OCR/tesseract.exe"
+notif = ToastNotifier()
+notif.show_toast("Start OCR 'fa'", "select with 'start+shift+s\nOCR with 'alt+shift+f'","icon.ico")
 
-image = ImageGrab.grabclipboard()
-status = None
 
-if image is None:
-    status = False
-else:
-    save_path = "image.png"
-    image.save(save_path)
-    status = True
+def ocr():
+    image = ImageGrab.grabclipboard()
 
-if status:
-    image = cv2.imread("image.png", 0)
-    pytesseract.get_languages()
-    ocr_text = pytesseract.image_to_string(image, lang="fas")
-    pyperclip.copy(ocr_text)
-    notif.show_toast("Parsian OCR", "Text copy to clipboard!")
-else:
-    notif.show_toast("Parsian OCR", "Please try again!")
+    if image is None:
+        status = False
+        notif.show_toast("Image not found", "please select with 'start+shift+s'","icon.ico", duration=3)
+    else:
+        save_path = "image.png"
+        image.save(save_path)
+        status = True
+
+    if status:
+        image = cv2.imread("image.png", 0)
+        pytesseract.get_languages()
+        ocr_text = pytesseract.image_to_string(image, lang="fas")
+        pyperclip.copy(ocr_text)
+        notif.show_toast("OCR successfully!", "Can sea in clipboard with 'ctrl+v' or 'start+v'","icon.ico", duration=3)
+
+
+while True:
+    logic = keyboard.is_pressed("alt") and keyboard.is_pressed("shift") and keyboard.is_pressed("f")
+
+    if logic:
+        ocr()
+        sleep(5)
